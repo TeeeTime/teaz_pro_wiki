@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- keycloak-js loads this in a hidden iframe to find an existing login without a redirect. -->
+    <script>
+      parent.postMessage(location.href, location.origin)
+    </script>
+  </body>
+</html>

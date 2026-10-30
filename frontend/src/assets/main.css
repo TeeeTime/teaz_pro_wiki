@@ -1,0 +1,267 @@
+@import '@teeetime/teaz-pro-ui/themes.css';
+@import '@teeetime/teaz-pro-ui/base.css';
+
+#app {
+  min-height: 100vh;
+}
+
+/*
+ * Small shared building blocks of this app (buttons, fields). Tokens only,
+ * sharp corners, see teaz_pro/docs/STYLE_GUIDE.md.
+ */
+
+h1,
+h2,
+h3,
+strong,
+b {
+  font-weight: 600;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btn .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.btn--primary {
+  color: var(--color-text-on-accent);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* Status red is a mark, not a text color (COLOR_SCHEMES.md): red border and icon, normal text. */
+.btn--danger {
+  border-color: var(--color-status-critical);
+}
+
+.btn--danger .icon {
+  color: var(--color-status-critical);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.btn--small {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.icon-btn:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.icon-btn .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.field:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.field {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.field::placeholder {
+  color: var(--color-text-secondary);
+}
+
+textarea.field {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.form-row + .form-row {
+  margin-top: 16px;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}
+
+/* A centered message for empty and error states. */
+.empty-state {
+  max-width: 480px;
+  margin: 64px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.empty-state__icon {
+  width: 40px;
+  height: 40px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state__title {
+  margin-top: 12px;
+  font-size: 1.25rem;
+}
+
+.empty-state__text {
+  margin-top: 8px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Dropdown panels (switcher, menus, pickers). */
+.popover {
+  position: absolute;
+  z-index: 30;
+  min-width: 200px;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px var(--color-shadow-strong);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item--active {
+  background: var(--color-surface-hover);
+}
+
+.menu-item .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+}
+
+.menu-item--danger .icon {
+  color: var(--color-status-critical);
+}
+
+.menu-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--color-border);
+}
+
+.menu-heading {
+  padding: 8px 10px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}

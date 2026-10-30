@@ -1,0 +1,493 @@
+/*
+ * Page content, the same for reading (ContentView) and editing (WikiEditor).
+ * Tokens only, so every theme works; user colors via --color-content-*.
+ */
+
+.wiki-content {
+  color: var(--color-text-primary);
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+
+.wiki-content .tiptap {
+  outline: none;
+}
+
+.wiki-content--editing .tiptap {
+  min-height: 320px;
+  padding: 20px 24px 48px;
+}
+
+.wiki-content .tiptap > * + * {
+  margin-top: 0.75em;
+}
+
+.wiki-content h1,
+.wiki-content h2,
+.wiki-content h3 {
+  line-height: 1.3;
+  scroll-margin-top: 120px;
+}
+
+.wiki-content h1 {
+  margin-top: 1.4em;
+  font-size: 1.5rem;
+}
+
+.wiki-content h2 {
+  margin-top: 1.3em;
+  font-size: 1.25rem;
+}
+
+.wiki-content h3 {
+  margin-top: 1.2em;
+  font-size: 1.075rem;
+}
+
+.wiki-content .tiptap > :first-child {
+  margin-top: 0;
+}
+
+.wiki-content strong {
+  font-weight: 600;
+}
+
+.wiki-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.wiki-content ul,
+.wiki-content ol {
+  padding-left: 1.6em;
+}
+
+.wiki-content li > p {
+  margin: 0;
+}
+
+.wiki-content li + li {
+  margin-top: 0.25em;
+}
+
+.wiki-content blockquote {
+  padding: 2px 0 2px 16px;
+  color: var(--color-text-secondary);
+  border-left: 3px solid var(--color-border);
+}
+
+.wiki-content code {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.875em;
+  background: var(--color-surface-hover);
+}
+
+.wiki-content pre {
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.wiki-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.wiki-content hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.wiki-content hr.ProseMirror-selectednode {
+  border-top-color: var(--color-accent);
+}
+
+.wiki-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+/* User colors: names stored in the content, values from the theme. Also used by the editor's swatches. */
+[data-text-color='gray'] { color: var(--color-content-gray); }
+[data-text-color='red'] { color: var(--color-content-red); }
+[data-text-color='orange'] { color: var(--color-content-orange); }
+[data-text-color='yellow'] { color: var(--color-content-yellow); }
+[data-text-color='green'] { color: var(--color-content-green); }
+[data-text-color='blue'] { color: var(--color-content-blue); }
+[data-text-color='purple'] { color: var(--color-content-purple); }
+[data-text-color='pink'] { color: var(--color-content-pink); }
+
+mark[data-highlight] {
+  padding: 0 1px;
+  color: inherit;
+}
+
+[data-highlight='gray'] { background: var(--color-content-gray-bg); }
+[data-highlight='red'] { background: var(--color-content-red-bg); }
+[data-highlight='orange'] { background: var(--color-content-orange-bg); }
+[data-highlight='yellow'] { background: var(--color-content-yellow-bg); }
+[data-highlight='green'] { background: var(--color-content-green-bg); }
+[data-highlight='blue'] { background: var(--color-content-blue-bg); }
+[data-highlight='purple'] { background: var(--color-content-purple-bg); }
+[data-highlight='pink'] { background: var(--color-content-pink-bg); }
+
+/* Tables ---------------------------------------------------------------- */
+
+.wiki-content .tableWrapper {
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.wiki-content table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 100%;
+}
+
+.wiki-content th,
+.wiki-content td {
+  position: relative;
+  min-width: 48px;
+  padding: 6px 10px;
+  vertical-align: top;
+  text-align: left;
+  border: 1px solid var(--color-border);
+}
+
+.wiki-content th {
+  font-weight: 600;
+  background: var(--color-surface-hover);
+}
+
+.wiki-content td > p,
+.wiki-content th > p {
+  margin: 0;
+}
+
+.wiki-content .selectedCell::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: '';
+  background: var(--color-accent);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.wiki-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  z-index: 3;
+  width: 4px;
+  background: var(--color-accent);
+  pointer-events: none;
+}
+
+.wiki-content .resize-cursor {
+  cursor: col-resize;
+}
+
+.wiki-content .row-resize-cursor {
+  cursor: row-resize;
+}
+
+/* Math ------------------------------------------------------------------ */
+
+.wiki-content .tiptap-mathematics-render {
+  padding: 0 2px;
+}
+
+.wiki-content .tiptap-mathematics-render--editable {
+  cursor: pointer;
+}
+
+.wiki-content .tiptap-mathematics-render--editable:hover {
+  background: var(--color-surface-hover);
+}
+
+.wiki-content [data-type='block-math'] {
+  margin: 1em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.wiki-content .katex {
+  color: var(--color-text-primary);
+}
+
+.wiki-content .katex-error,
+.wiki-content .inline-math-error,
+.wiki-content .block-math-error {
+  color: var(--color-content-red);
+}
+
+/* Images ---------------------------------------------------------------- */
+
+.image-block,
+.image-text {
+  position: relative;
+  margin: 1em 0;
+}
+
+.image-block__row {
+  display: grid;
+  gap: 12px;
+}
+
+.image-block--single .image-block__row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.image-block--align-center .image-block__row {
+  margin: 0 auto;
+}
+
+.image-block--align-right .image-block__row {
+  margin-left: auto;
+}
+
+.image-block--two .image-block__row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-block--three .image-block__row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.image-block__figure,
+.image-text__figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.image-block__frame {
+  position: relative;
+}
+
+.image-block__caption {
+  margin-top: 6px;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.image-block__caption-input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+}
+
+.image-block__caption-input:focus {
+  color: var(--color-text-primary);
+  border-style: solid;
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.image-block__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  cursor: pointer;
+}
+
+.image-block__empty:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-accent);
+}
+
+.image-block__empty .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.image-block__busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  opacity: 0.85;
+}
+
+.image-text__grid {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+.image-text--left.image-text--third .image-text__grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+
+.image-text--right.image-text--third .image-text__grid {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.image-text--half .image-text__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-text--right .image-text__figure {
+  order: 2;
+}
+
+.image-text__text > * + * {
+  margin-top: 0.75em;
+}
+
+.image-text__text > :first-child {
+  margin-top: 0;
+}
+
+/* Stack on narrow screens: images full width, text below. */
+@media (max-width: 600px) {
+  .image-block--three .image-block__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .image-block--single .image-block__row {
+    width: 100% !important;
+  }
+
+  .image-text .image-text__grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .image-text--right .image-text__figure {
+    order: 0;
+  }
+}
+
+/* Editing controls of image blocks. */
+.image-block--editable,
+.image-text--editable {
+  padding-top: 40px;
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+}
+
+.image-block--editable:hover,
+.image-text--editable:hover,
+.image-block--selected,
+.wiki-content .ProseMirror-selectednode.image-text {
+  outline-color: var(--color-border);
+}
+
+.image-block--selected {
+  outline: 2px solid var(--color-accent);
+}
+
+.image-tools {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  opacity: 0.35;
+  transition: opacity var(--transition-fast);
+}
+
+.image-block:hover .image-tools,
+.image-text:hover .image-tools,
+.image-block--selected .image-tools,
+.image-tools:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .image-tools {
+    opacity: 1;
+  }
+}
+
+.image-tools__group {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.image-tools__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: none;
+  cursor: pointer;
+}
+
+.image-tools__btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.image-tools__btn--on {
+  color: var(--color-accent);
+  background: var(--color-surface-active);
+}
+
+.image-tools__btn .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.image-block__overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 1px;
+  border: 1px solid var(--color-border);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.image-block__frame:hover .image-block__overlay,
+.image-block__overlay:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .image-block__overlay {
+    opacity: 1;
+  }
+}
+
+.wiki-content .ProseMirror-gapcursor::after {
+  border-top-color: var(--color-text-primary);
+}

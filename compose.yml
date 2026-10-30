@@ -1,0 +1,61 @@
+# Production deploy on the VPS: `docker compose up -d --build`.
+# Expects the shared Traefik instance on the external "proxy" network
+# with a certificate resolver named "le", the shared Postgres server on the
+# external "db" network, and the variables below in .env (see README).
+services:
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on: [backend]
+    # "internal": nginx sends link-preview crawlers to the backend (nginx.conf).
+    networks: [proxy, internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wiki.rule=Host(`wiki.teaz.pro`)
+      - traefik.http.routers.wiki.tls.certresolver=le
+      - traefik.http.services.wiki.loadbalancer.server.port=80
+      - traefik.docker.network=proxy
+      # Shown and controllable in Teaz Pulse.
+      - pro.teaz.pulse.app=Wiki
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Own database "wiki" with own user "wiki" on the shared Postgres server.
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:?set SPRING_DATASOURCE_URL in .env, see README}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:?set SPRING_DATASOURCE_USERNAME in .env, see README}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?set SPRING_DATASOURCE_PASSWORD in .env, see README}
+      # Confidential Keycloak client for the user search (service account, view-users).
+      WIKI_KEYCLOAK_ADMIN_CLIENT_ID: ${WIKI_KEYCLOAK_ADMIN_CLIENT_ID:-wiki-admin}
+      WIKI_KEYCLOAK_ADMIN_CLIENT_SECRET: ${WIKI_KEYCLOAK_ADMIN_CLIENT_SECRET:?set WIKI_KEYCLOAK_ADMIN_CLIENT_SECRET in .env, see README}
+    volumes:
+      - files:/data/files
+    networks:
+      proxy:
+      db:
+      internal:
+        # Unique name for nginx: every app's backend is called "backend" on "proxy".
+        aliases: [wiki-backend]
+    labels:
+      - traefik.enable=true
+      # Same host, /api only; Traefik prefers this longer rule over the frontend's.
+      - traefik.http.routers.wiki-api.rule=Host(`wiki.teaz.pro`) && PathPrefix(`/api`)
+      - traefik.http.routers.wiki-api.tls.certresolver=le
+      - traefik.http.services.wiki-api.loadbalancer.server.port=8080
+      # Traefik must reach it via "proxy", not the database network.
+      - traefik.docker.network=proxy
+      - pro.teaz.pulse.app=Wiki
+
+volumes:
+  # Uploaded images (pages, logos). Everything else lives in the database.
+  files:
+
+networks:
+  proxy:
+    external: true
+  # The shared Postgres server's network (internal), see /opt/teazpro/postgres.
+  db:
+    external: true
+  internal:
