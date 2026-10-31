@@ -1,7 +1,8 @@
 import type { TreeNode } from '@/types'
 
 /*
- * URLs: /{wikiId}/{category}/{sub-category or page}/{page}. App pages of a
+ * URLs: /{wikiId}/{category}/{sub-category or page}/{sub-category or page}/{page}.
+ * App pages of a
  * wiki live under the segment "-", which is never a slug:
  * /{wikiId}/-/settings, /{wikiId}/-/new, /{wikiId}/-/search.
  */
@@ -34,9 +35,21 @@ export function ancestry(tree: readonly TreeNode[], id: string): TreeNode[] {
   return chain
 }
 
-/** 0 = top level; the depth rules allow 0..2 (see NodeService). */
+/**
+ * Deepest level: 0 = top level (categories only), MAX_LEVEL holds pages only
+ * (see NodeService).
+ */
+export const MAX_LEVEL = 3
+
+/** 0 = top level; the depth rules allow 0..MAX_LEVEL. */
 export function level(tree: readonly TreeNode[], id: string): number {
   return ancestry(tree, id).length - 1
+}
+
+/** Hint for the dialog that creates a sub-category on `atLevel`. */
+export function subCategoryHint(atLevel: number): string {
+  const holds = atLevel + 1 < MAX_LEVEL ? 'pages and further sub-categories' : 'pages'
+  return `Sub-categories here hold ${holds}. Like every category, it can have content of its own.`
 }
 
 export function children(tree: readonly TreeNode[], parentId: string | null): TreeNode[] {

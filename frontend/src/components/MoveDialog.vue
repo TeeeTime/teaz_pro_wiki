@@ -1,31 +1,38 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Icon } from '@teeetime/teaz-pro-ui'
-import { ancestry, children, level } from '@/paths'
+import { MAX_LEVEL, ancestry, children, level } from '@/paths'
 import type { TreeNode } from '@/types'
 import Modal from '@/components/Modal.vue'
 
 /*
  * Picks a new place for a node. Offers only places the depth rules allow
- * (see NodeService): the top level takes categories, sub-categories take
- * pages, nothing goes deeper than three levels.
+ * (see NodeService): the top level takes categories, the deepest level
+ * (MAX_LEVEL) takes pages only, nothing goes deeper.
  */
 const props = defineProps<{ node: TreeNode; tree: TreeNode[] }>()
 const emit = defineEmits<{ move: [parentId: string | null]; close: [] }>()
 
-/** How many levels the node occupies: 1 (no children), 2 or 3. */
+/** How many levels the node occupies: 1 (no children) up to MAX_LEVEL + 1. */
 const height = computed(() => {
   const below = (id: string): number =>
     Math.max(0, ...children(props.tree, id).map((child) => 1 + below(child.id)))
   return 1 + below(props.node.id)
 })
-const hasSubCategory = computed(() => children(props.tree, props.node.id).some((n) => n.kind === 'CATEGORY'))
+
+/** How far below the node its deepest category is (0 = the node itself), -1 without categories. */
+const categoryDepth = computed(() => {
+  const below = (node: TreeNode): number =>
+    node.kind !== 'CATEGORY'
+      ? -1
+      : Math.max(0, ...children(props.tree, node.id).map((child) => below(child) + 1).filter((d) => d > 0))
+  return below(props.node)
+})
 
 function allowedAt(targetLevel: number): boolean {
-  if (targetLevel + height.value - 1 > 2) return false
+  if (targetLevel + height.value - 1 > MAX_LEVEL) return false
   if (targetLevel === 0 && props.node.kind !== 'CATEGORY') return false
-  if (targetLevel === 2 && props.node.kind !== 'PAGE') return false
-  if (targetLevel === 1 && hasSubCategory.value) return false
+  if (categoryDepth.value >= 0 && targetLevel + categoryDepth.value >= MAX_LEVEL) return false
   return true
 }
 

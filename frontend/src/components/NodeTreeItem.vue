@@ -2,7 +2,7 @@
 import { computed, inject, ref } from 'vue'
 import { Icon } from '@teeetime/teaz-pro-ui'
 import { WIKI } from '@/keys'
-import { children, nodePath, slugPath } from '@/paths'
+import { MAX_LEVEL, children, nodePath, slugPath } from '@/paths'
 import { usePopover } from '@/popover'
 import type { TreeNode } from '@/types'
 import { TREE, type DropPlace } from '@/components/tree'
@@ -14,6 +14,8 @@ const { tree } = inject(WIKI)!
 const actions = inject(TREE)!
 
 const isCategory = computed(() => props.node.kind === 'CATEGORY')
+/** Whether a category may go in here; below that, only pages. */
+const takesCategories = computed(() => props.level + 1 < MAX_LEVEL)
 const items = computed(() => children(tree.value, props.node.id))
 const open = computed(() => actions.expanded.value.has(props.node.id))
 const active = computed(() => actions.activeId.value === props.node.id)
@@ -100,7 +102,7 @@ function onDragEnd() {
             class="icon-btn item__action"
             :aria-label="`Add to ${node.title}`"
             title="Add"
-            @click="level === 0 ? add.toggle() : actions.newPage(node)"
+            @click="takesCategories ? add.toggle() : actions.newPage(node)"
           >
             <Icon name="plus" />
           </button>
@@ -200,6 +202,10 @@ function onDragEnd() {
 
 .item__row--level-2 {
   padding-left: 32px;
+}
+
+.item__row--level-3 {
+  padding-left: 48px;
 }
 
 .item__row--drop-before {

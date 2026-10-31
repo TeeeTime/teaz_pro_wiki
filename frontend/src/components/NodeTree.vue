@@ -5,7 +5,7 @@ import { Icon } from '@teeetime/teaz-pro-ui'
 import { api } from '@/api'
 import { WIKI } from '@/keys'
 import { confirmAction, notifyError } from '@/feedback'
-import { ancestry, children, nodePath, slugPath, wikiPath } from '@/paths'
+import { ancestry, children, level, nodePath, slugPath, subCategoryHint, wikiPath } from '@/paths'
 import { canEdit as canEditLevel, type NodeDetail, type TreeNode } from '@/types'
 import { TREE, type DropPlace, type TreeActions } from '@/components/tree'
 import NodeTreeItem from '@/components/NodeTreeItem.vue'
@@ -210,7 +210,7 @@ const categoryParent = computed(() => (dialog.value?.type === 'category' ? dialo
     submit-label="Create"
     :hint="
       categoryParent
-        ? 'Sub-categories hold pages. Like every category, it can have content of its own.'
+        ? subCategoryHint(level(tree, categoryParent.id) + 1)
         : 'Categories are the top level of the wiki. They hold pages and sub-categories and can have content of their own.'
     "
     @submit="createCategory"

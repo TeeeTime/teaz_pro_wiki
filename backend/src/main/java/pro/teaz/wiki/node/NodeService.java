@@ -19,22 +19,23 @@ import pro.teaz.wiki.users.Users;
 import pro.teaz.wiki.wiki.WikiAccess;
 
 /**
- * Categories and pages. The structure is at most three levels deep:
+ * Categories and pages. The structure is at most four levels deep:
  *
  * <ol start="0">
  * <li>categories only</li>
  * <li>pages or sub-categories, in a category</li>
- * <li>pages only, in a sub-category</li>
+ * <li>pages or sub-categories, in a sub-category</li>
+ * <li>pages only, in a sub-category of a sub-category</li>
  * </ol>
  *
  * Names are unique among siblings by their slug, since siblings share the URL
- * prefix: wiki.teaz.pro/{wiki}/{category}/{sub-category or page}/{page}.
+ * prefix: wiki.teaz.pro/{wiki}/{category}/{sub-category or page}/{sub-category or page}/{page}.
  */
 @Service
 public class NodeService {
 
 	static final int MAX_TITLE = 120;
-	static final int MAX_LEVEL = 2;
+	static final int MAX_LEVEL = 3;
 	static final int RECENT = 8;
 	static final int MAX_HITS = 30;
 	static final int SNIPPET_RADIUS = 70;
@@ -259,12 +260,12 @@ public class NodeService {
 		return node.getParentId() == null ? Node.ROOT_KEY : node.getParentId();
 	}
 
-	/** Top level: categories only. Third level: pages only. Nothing deeper. */
+	/** Top level: categories only. Fourth level: pages only. Nothing deeper. */
 	static void checkPlacement(Node.Kind kind, int level) {
-		if (level > MAX_LEVEL) throw badRequest("The structure is at most three levels deep.");
+		if (level > MAX_LEVEL) throw badRequest("The structure is at most four levels deep.");
 		if (level == 0 && kind != Node.Kind.CATEGORY) throw badRequest("The top level only holds categories.");
 		if (level == MAX_LEVEL && kind != Node.Kind.PAGE) {
-			throw badRequest("Sub-categories can only hold pages, not further categories.");
+			throw badRequest("Sub-categories at this level can only hold pages, not further categories.");
 		}
 	}
 

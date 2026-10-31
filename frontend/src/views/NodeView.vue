@@ -5,7 +5,7 @@ import { Icon } from '@teeetime/teaz-pro-ui'
 import { api, ApiError } from '@/api'
 import { WIKI } from '@/keys'
 import { confirmAction, notify, notifyError } from '@/feedback'
-import { ancestry, children, level, nodePath, slugPath, wikiPath } from '@/paths'
+import { MAX_LEVEL, ancestry, children, level, nodePath, slugPath, subCategoryHint, wikiPath } from '@/paths'
 import { canEdit as canEditLevel, type NodeDetail, type NodeKind } from '@/types'
 import ContentView from '@/editor/ContentView.vue'
 import WikiEditor from '@/editor/WikiEditor.vue'
@@ -70,7 +70,7 @@ async function load() {
   }
   const path = route.params.path
   const slugs = Array.isArray(path) ? path : [path]
-  if (slugs.length > 3) {
+  if (slugs.length > MAX_LEVEL + 1) {
     notFound.value = true
     return
   }
@@ -245,7 +245,7 @@ function formatDate(value: string): string {
               <Icon name="file" />
               New page
             </RouterLink>
-            <button v-if="nodeLevel === 0" type="button" class="btn btn--small" @click="newCategory = true">
+            <button v-if="nodeLevel + 1 < MAX_LEVEL" type="button" class="btn btn--small" @click="newCategory = true">
               <Icon name="folder" />
               New sub-category
             </button>
@@ -258,7 +258,7 @@ function formatDate(value: string): string {
               <Icon :name="item.kind === 'CATEGORY' ? 'folder' : 'file'" />
               <span class="contents__name">{{ item.title }}</span>
               <span v-if="item.kind === 'CATEGORY'" class="contents__count">
-                {{ children(tree, item.id).length }} {{ children(tree, item.id).length === 1 ? 'page' : 'pages' }}
+                {{ children(tree, item.id).length }} {{ children(tree, item.id).length === 1 ? 'entry' : 'entries' }}
               </span>
             </RouterLink>
           </li>
@@ -273,7 +273,7 @@ function formatDate(value: string): string {
       :title="`New sub-category in ${node.title}`"
       label="Name"
       submit-label="Create"
-      hint="Sub-categories hold pages. Like every category, it can have content of its own."
+      :hint="subCategoryHint(nodeLevel + 1)"
       @submit="createSubCategory"
       @close="newCategory = false"
     />

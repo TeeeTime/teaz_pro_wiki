@@ -23,17 +23,17 @@ README only covers what is specific to this app.
 ## Structure and URLs
 
 ```
-wiki.teaz.pro/{wiki id}/{category}/{sub-category or page}/{page}
+wiki.teaz.pro/{wiki id}/{category}/{sub-category or page}/{sub-category or page}/{page}
 ```
 
 - The wiki id is 8 random characters `[a-z0-9]`.
-- Level 0 holds only **categories**; level 1 pages or **sub-categories**;
-  level 2 only pages. Nothing deeper (`NodeService`).
+- Level 0 holds only **categories**; levels 1 and 2 pages or
+  **sub-categories**; level 3 only pages. Nothing deeper (`NodeService`).
 - Categories have content of their own (context for their pages) and list
   what's in them; a link to a category opens it.
 - URL segments are slugs of the names (`Über uns` → `ueber-uns`). Names must
   be unique by slug among siblings: top-level categories in the wiki,
-  level 1 within its category, level 2 within its sub-category.
+  deeper levels within their category or sub-category.
 - A link to the wiki alone opens an overview built from the structure (not
   editable).
 - App pages of a wiki use the segment `-`, which is never a slug:

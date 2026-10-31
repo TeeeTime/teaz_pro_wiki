@@ -108,17 +108,23 @@ class WikiFlowTests {
 	}
 
 	@Test
-	void structureIsThreeLevelsWithUniqueNamesPerLevel() throws Exception {
+	void structureIsFourLevelsWithUniqueNamesPerLevel() throws Exception {
 		String wiki = createWiki("Structure");
 		String guides = createNode(wiki, null, "CATEGORY", "Guides").path("id").asString();
 		String setup = createNode(wiki, guides, "CATEGORY", "Setup").path("id").asString();
 		createNode(wiki, setup, "PAGE", "Linux");
+		String distros = createNode(wiki, setup, "CATEGORY", "Distros").path("id").asString();
+		String debian = createNode(wiki, distros, "PAGE", "Debian").path("id").asString();
 
 		call(post("/api/wikis/" + wiki + "/nodes").with(user(OWNER)), Map.of("kind", "PAGE", "title", "Top page"))
 			.andExpect(status().isBadRequest());
 		call(post("/api/wikis/" + wiki + "/nodes").with(user(OWNER)),
-				Map.of("kind", "CATEGORY", "title", "Too deep", "parentId", setup))
+				Map.of("kind", "CATEGORY", "title", "Too deep", "parentId", distros))
 			.andExpect(status().isBadRequest());
+		call(post("/api/wikis/" + wiki + "/nodes").with(user(OWNER)),
+				Map.of("kind", "PAGE", "title", "Too deep", "parentId", debian))
+			.andExpect(status().isBadRequest());
+		ok(get("/api/wikis/" + wiki + "/nodes/by-path?path=guides/setup/distros/debian").with(user(OWNER)), null);
 		call(post("/api/wikis/" + wiki + "/nodes").with(user(OWNER)), Map.of("kind", "CATEGORY", "title", "guides!"))
 			.andExpect(status().isConflict());
 		// Same name on another level or under another parent is fine.
@@ -131,10 +137,10 @@ class WikiFlowTests {
 		assertThat(ok(get("/api/wikis/" + wiki + "/nodes/by-path?path=ueber-uns").with(user(OWNER)), null)
 			.path("kind").asString()).isEqualTo("CATEGORY");
 
-		// A category with a sub-category can't become a sub-category itself.
+		// A category three levels deep can't become a sub-category itself.
 		call(post("/api/wikis/" + wiki + "/nodes/" + guides + "/move").with(user(OWNER)), Map.of("parentId", other))
 			.andExpect(status().isBadRequest());
-		// A sub-category with pages may move to the top level...
+		// A sub-category with pages and a sub-category may move to the top level...
 		ok(post("/api/wikis/" + wiki + "/nodes/" + setup + "/move").with(user(OWNER)), Map.of("position", 0));
 		ok(get("/api/wikis/" + wiki + "/nodes/by-path?path=setup/linux").with(user(OWNER)), null);
 		// ...but not next to a sibling of the same name ("Setup" in "Über uns").
