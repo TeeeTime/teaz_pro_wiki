@@ -61,6 +61,18 @@ public class NodeService {
 	@Transactional(readOnly = true)
 	public NodeDtos.NodeDetail byPath(String wikiId, String path) {
 		access.read(wikiId);
+		return detail(findByPath(wikiId, path));
+	}
+
+	/** The title, path and plain text of a page, e.g. for the MCP server's get_page tool. */
+	@Transactional(readOnly = true)
+	public NodeDtos.TextDetail textByPath(String wikiId, String path) {
+		access.read(wikiId);
+		Node node = findByPath(wikiId, path);
+		return new NodeDtos.TextDetail(node.getTitle(), path(node), node.getPlainText());
+	}
+
+	private Node findByPath(String wikiId, String path) {
 		List<String> slugs = Arrays.stream(path.split("/")).filter(s -> !s.isBlank()).toList();
 		if (slugs.isEmpty() || slugs.size() > MAX_LEVEL + 1) throw notFound();
 		Node node = null;
@@ -69,7 +81,7 @@ public class NodeService {
 			node = nodes.findByWikiIdAndParentKeyAndSlug(wikiId, parentKey, slug.toLowerCase(Locale.ROOT))
 					.orElseThrow(NodeService::notFound);
 		}
-		return detail(node);
+		return node;
 	}
 
 	@Transactional(readOnly = true)

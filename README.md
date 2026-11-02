@@ -13,6 +13,8 @@ Teaz Wiki, at `https://wiki.teaz.pro`: Confluence-like wikis.
   can read the wiki; replies are shown one level indented.
 - Keyword **search** over a wiki's titles and texts.
 - Links shared in Discord, Slack, WhatsApp & co. show a **preview**.
+- An **MCP server** lets an AI assistant search wikis read-only, under the
+  same permissions as the signed-in user (see "AI access (MCP)" below).
 
 Monorepo: `frontend/` (Vue 3 + TypeScript) and `backend/` (Spring Boot, `pro.teaz:wiki`).
 
@@ -142,6 +144,48 @@ Keycloak setup (realm `teazpro`):
    **Service accounts roles → Assign role → Filter by clients**, assign
    `realm-management` **view-users**. Its secret (Credentials tab) goes into
    `.env` as `WIKI_KEYCLOAK_ADMIN_CLIENT_SECRET`.
+3. Client `wiki-mcp`, for AI access below: public, standard flow, PKCE S256,
+   **Offline access** client scope added, redirect URI(s) of whichever MCP
+   client the user connects (e.g. Claude's). Add a client scope `wiki:read`
+   (realm-level, type default) and assign it to `wiki-mcp`.
+
+## AI access (MCP)
+
+A read-only [MCP](https://modelcontextprotocol.io) server at
+`https://wiki.teaz.pro/api/mcp` (`pro.teaz.wiki.mcp`) lets an AI assistant
+search wikis: `list_wikis`, `search_wiki`, `get_page`. There is no tool to
+create, edit or delete anything.
+
+- **No new access model.** The MCP endpoint is just another entry point
+  into the existing Keycloak JWT + `WikiAccess` chokepoint
+  (`security/SecurityConfig.java`): `list_wikis` only ever returns public
+  wikis plus the caller's own/shared ones, and `search_wiki`/`get_page`
+  still go through `access.read(wikiId)`, so a private wiki a caller
+  shouldn't see 404s there exactly as it would in the browser, even if its
+  id leaked some other way.
+- **No login needed for public wikis.** `/api/mcp` lets anonymous callers
+  through, same as the rest of the API. A Bearer token is only trusted as
+  that signed-in user if it carries the `wiki:read` scope; any other token
+  (a bad signature, the wrong issuer, or a real but unrelated-scope Keycloak
+  token, e.g. from the regular `wiki` client) is rejected or silently
+  treated as anonymous, never as that person
+  (`SecurityConfig.RequireMcpReadScope`) — someone's browser session can
+  never leak into AI access just because a token happened to be lying
+  around.
+- **Connecting** for private wikis too: in an MCP-capable AI client, add
+  `https://wiki.teaz.pro/api/mcp` as a remote server. The client discovers
+  (RFC 9728, `/.well-known/oauth-protected-resource`) that it may log in via
+  the `wiki-mcp` client for the `wiki:read` scope, and opens that
+  login/consent in a browser.
+- **Revoking access**: Keycloak's own Account Console → Applications →
+  `wiki-mcp` → revoke. There's deliberately no separate token to manage on
+  the wiki side (OAuth, not a static secret; see the security concept this
+  was planned with).
+- **Auditing**: `GET /api/my/mcp-access-log` (authenticated) lists the
+  caller's recent MCP tool calls (`mcp/McpAccessLog.java`). No UI shows this
+  yet in this repo — it's meant for the future `account.teaz.pro`, which
+  will host account-level settings across every Teaz app; until then this
+  section of the README is the documentation.
 
 ## Database
 

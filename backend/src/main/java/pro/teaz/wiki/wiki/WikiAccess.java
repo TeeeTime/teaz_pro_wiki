@@ -1,5 +1,9 @@
 package pro.teaz.wiki.wiki;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -90,6 +94,24 @@ public class WikiAccess {
 		Grant grant = read(wikiId);
 		if (grant.level() != Level.OWNER) throw forbidden("Only the owner can change the wiki's settings.");
 		return grant;
+	}
+
+	/**
+	 * Every public wiki, plus the caller's own and shared ones (not merely
+	 * subscribed-to public ones, unlike {@code WikiService.list()}). This is
+	 * the complete set an MCP-style cross-wiki search may look at; reading any
+	 * one of them still goes through {@link #read(String)} as usual.
+	 */
+	public List<Wiki> readableWikis() {
+		Map<String, Wiki> result = new LinkedHashMap<>();
+		for (Wiki wiki : wikis.findByVisibility(Wiki.Visibility.PUBLIC)) result.put(wiki.getId(), wiki);
+		user.id().ifPresent(id -> {
+			for (Wiki wiki : wikis.findByOwnerId(id)) result.put(wiki.getId(), wiki);
+			for (WikiMember member : members.findByUserId(id)) {
+				wikis.findById(member.getWikiId()).ifPresent(wiki -> result.put(wiki.getId(), wiki));
+			}
+		});
+		return new ArrayList<>(result.values());
 	}
 
 	public static ResponseStatusException notFound() {

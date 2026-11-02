@@ -48,4 +48,8 @@ public final class NodeDtos {
 	/** @param snippet text around the first match, or the start of the text for title-only matches */
 	public record SearchHit(UUID id, Node.Kind kind, String title, List<String> path, String snippet) {
 	}
+
+	/** A page's plain text, e.g. for the MCP server's get_page tool. */
+	public record TextDetail(String title, List<String> path, String text) {
+	}
 }
