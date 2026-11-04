@@ -177,15 +177,15 @@ create, edit or delete anything.
   (RFC 9728, `/.well-known/oauth-protected-resource`) that it may log in via
   the `wiki-mcp` client for the `wiki:read` scope, and opens that
   login/consent in a browser.
-- **Revoking access**: Keycloak's own Account Console → Applications →
-  `wiki-mcp` → revoke. There's deliberately no separate token to manage on
-  the wiki side (OAuth, not a static secret; see the security concept this
-  was planned with).
-- **Auditing**: `GET /api/my/mcp-access-log` (authenticated) lists the
-  caller's recent MCP tool calls (`mcp/McpAccessLog.java`). No UI shows this
-  yet in this repo — it's meant for the future `account.teaz.pro`, which
-  will host account-level settings across every Teaz app; until then this
-  section of the README is the documentation.
+- **Revoking access**: `account.teaz.pro` → Connected apps → Disconnect,
+  which signs out `wiki-mcp` on all of a user's devices. There's deliberately
+  no separate token to manage on the wiki side (OAuth, not a static secret).
+- **Auditing**: the wiki's settings (owner only) show under **AI access** who
+  read what, from `GET /api/wikis/{id}/mcp-access-log`
+  (`mcp/McpAccessLog.java`). A search across all wikis counts once per wiki
+  searched; `list_wikis` belongs to no wiki and doesn't show there.
+  `GET /api/my/mcp-access-log` lists the caller's own tool calls. Entries
+  hold search terms, so a daily job deletes them after 30 days.
 
 ## Database
 

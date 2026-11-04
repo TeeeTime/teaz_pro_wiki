@@ -10,12 +10,13 @@ import { uploadImage } from '@/files'
 import type { MemberRole, MemberView, UserView, Visibility, WikiDetail } from '@/types'
 import WikiLogo from '@/components/WikiLogo.vue'
 import LogoDialog from '@/components/LogoDialog.vue'
+import McpAccessLog from '@/components/McpAccessLog.vue'
 import Modal from '@/components/Modal.vue'
 
 /*
  * The owner's settings of a wiki: name, logo, description, who may read and
  * edit (people found by the user search, with a role), public or private,
- * and deleting it.
+ * what AI assistants read, and deleting it.
  */
 const { wiki, reloadWiki } = inject(WIKI)!
 const router = useRouter()
@@ -319,6 +320,8 @@ const ROLE_TEXT: Record<MemberRole, string> = {
           </li>
         </ul>
       </section>
+
+      <McpAccessLog :wiki-id="wiki.id" />
 
       <section class="panel panel--danger">
         <h2 class="panel__title">Delete wiki</h2>

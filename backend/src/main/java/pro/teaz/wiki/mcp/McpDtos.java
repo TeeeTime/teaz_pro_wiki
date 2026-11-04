@@ -3,6 +3,8 @@ package pro.teaz.wiki.mcp;
 import java.time.Instant;
 import java.util.List;
 
+import pro.teaz.wiki.users.Users;
+
 /** JSON shapes returned by the MCP tools (WikiMcpTools) and the access log API. */
 public final class McpDtos {
 
@@ -20,5 +22,12 @@ public final class McpDtos {
 	}
 
 	public record AccessLogEntry(String tool, String wikiId, String query, Instant at) {
+	}
+
+	/** @param user who the AI assistant acted for; null for a guest */
+	public record WikiAccessEntry(Users.UserView user, String tool, String query, Instant at) {
+	}
+
+	public record WikiAccessPage(List<WikiAccessEntry> entries, boolean hasMore) {
 	}
 }

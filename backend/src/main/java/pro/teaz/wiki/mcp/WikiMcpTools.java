@@ -54,8 +54,8 @@ public class WikiMcpTools {
 			@McpToolParam(description = "Keyword(s) to search for.", required = true) String query,
 			@McpToolParam(description = "Limit the search to this wiki id. Omit to search all readable wikis.",
 					required = false) String wikiId) {
-		accessLog.record(callerId(), wikiId, "search_wiki", query);
 		if (wikiId != null && !wikiId.isBlank()) {
+			accessLog.record(callerId(), wikiId, "search_wiki", query);
 			Wiki wiki = access.read(wikiId).wiki();
 			return hits(wiki.getId(), wiki.getName(), query);
 		}
@@ -64,6 +64,8 @@ public class WikiMcpTools {
 		for (Wiki wiki : access.readableWikis()) {
 			if (all.size() >= MAX_TOTAL_HITS || wikisSearched >= MAX_WIKIS_SEARCHED) break;
 			wikisSearched++;
+			// One entry per wiki, so it shows in the settings of each wiki that was searched.
+			accessLog.record(callerId(), wiki.getId(), "search_wiki", query);
 			all.addAll(hits(wiki.getId(), wiki.getName(), query));
 		}
 		return all.stream().limit(MAX_TOTAL_HITS).toList();
@@ -87,6 +89,6 @@ public class WikiMcpTools {
 	}
 
 	private String callerId() {
-		return user.id().orElse("guest");
+		return user.id().orElse(McpAccessLogService.GUEST);
 	}
 }

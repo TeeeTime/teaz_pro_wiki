@@ -89,6 +89,19 @@ class WikiMcpToolsTests {
 	}
 
 	@Test
+	void searchAcrossAllWikisIsLoggedInEachWikiSearched() {
+		String first = wikiWithPage("Logged one", Wiki.Visibility.PRIVATE, "text");
+		String second = wikiWithPage("Logged two", Wiki.Visibility.PRIVATE, "text");
+
+		signIn(OWNER);
+		tools.searchWiki("kangaroo", null);
+
+		for (String wiki : List.of(first, second)) {
+			assertThat(accessLog.forWiki(wiki, 0).entries()).extracting(McpDtos.WikiAccessEntry::query).contains("kangaroo");
+		}
+	}
+
+	@Test
 	void searchAcrossAllWikisExcludesOnesTheCallerCantRead() {
 		String privateWiki = wikiWithPage("Private search", Wiki.Visibility.PRIVATE, "confidential roadmap details");
 		wikiWithPage("Public search", Wiki.Visibility.PUBLIC, "confidential-looking but public text");

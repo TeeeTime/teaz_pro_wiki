@@ -109,3 +109,17 @@ export interface FileView {
 export function canEdit(level: AccessLevel): boolean {
   return level === 'EDITOR' || level === 'OWNER'
 }
+
+export interface McpAccessEntry {
+  /** Null for a guest. */
+  user: UserView | null
+  tool: string
+  /** The search term, or a page's path. */
+  query: string | null
+  at: string
+}
+
+export interface McpAccessPage {
+  entries: McpAccessEntry[]
+  hasMore: boolean
+}
