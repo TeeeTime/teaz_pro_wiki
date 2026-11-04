@@ -40,7 +40,7 @@ class McpSecurityTests {
 
 	private static void assertNotASecurityRejection(ResultActions result) throws Exception {
 		int status = result.andReturn().getResponse().getStatus();
-		assertThat(status).isNotIn(401, 403);
+		assertThat(status).isNotIn(401, 403, 404);
 	}
 
 	@Test
