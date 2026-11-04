@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Icon } from '@teeetime/teaz-pro-ui'
+import { Avatar, Icon, avatarUrl } from '@teeetime/teaz-pro-ui'
 import { api } from '@/api'
 import { useAuth } from '@/auth'
 import { confirmAction, notifyError } from '@/feedback'
@@ -90,14 +90,6 @@ function formatTime(value: string): string {
   return new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-function initials(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
 </script>
 
 <template>
@@ -112,7 +104,7 @@ function initials(name: string): string {
       <li v-for="comment in comments" :key="comment.id" class="thread">
         <template v-for="entry in [comment, ...comment.replies]" :key="entry.id">
           <div class="comment" :class="{ 'comment--reply': entry.parentId }">
-            <span class="comment__avatar" aria-hidden="true">{{ entry.author ? initials(entry.author.name) : '–' }}</span>
+            <Avatar :src="avatarUrl(entry.author?.id, 64)" :name="entry.author?.name ?? '–'" :size="32" />
             <div class="comment__main">
               <div class="comment__head">
                 <span class="comment__author">{{ entry.author?.name ?? 'Deleted comment' }}</span>
@@ -216,21 +208,6 @@ function initials(name: string): string {
   margin-left: 44px;
   padding-left: 14px;
   border-left: 2px solid var(--color-border);
-}
-
-.comment__avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-on-accent);
-  background: var(--color-accent);
-  /* Square: the TopBar avatar is the only round exception (STYLE_GUIDE.md). */
-  border-radius: var(--radius-sm);
 }
 
 .comment__main {

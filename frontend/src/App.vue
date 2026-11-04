@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref } from 'vue'
-import { TopBar, useTheme } from '@teeetime/teaz-pro-ui'
+import { ACCOUNT_URL, TopBar, avatarUrl, useTheme } from '@teeetime/teaz-pro-ui'
 import type { TopBarMenuItem } from '@teeetime/teaz-pro-ui'
 import { useAuth } from '@/auth'
 import { loadMyWikis } from '@/state'
@@ -21,7 +21,10 @@ provide(CURRENT_WIKI, currentWiki)
 
 const menuItems = computed<TopBarMenuItem[]>(() => {
   const items: TopBarMenuItem[] = auth.user.value
-    ? [{ label: 'Sign out', icon: 'logout' }]
+    ? [
+        { label: 'Account', icon: 'user' },
+        { label: 'Sign out', icon: 'logout' },
+      ]
     : [{ label: 'Sign in', icon: 'login' }]
   // Local dev: switch between the mock users (mockAuth.ts).
   for (const user of auth.devUsers ?? []) {
@@ -32,6 +35,7 @@ const menuItems = computed<TopBarMenuItem[]>(() => {
 
 function onMenuSelect(item: TopBarMenuItem) {
   if (item.label === 'Sign out') auth.logout()
+  else if (item.label === 'Account') window.location.href = ACCOUNT_URL
   else if (item.label === 'Sign in') auth.login()
   else {
     const user = auth.devUsers?.find((u) => item.label === `Switch to ${u.name}`)
@@ -46,6 +50,7 @@ onMounted(() => loadMyWikis().catch(notifyError))
   <TopBar
     home-url="https://portal.teaz.pro"
     :user-name="auth.user.value?.name ?? 'Guest'"
+    :avatar-url="avatarUrl(auth.user.value?.id, 64)"
     :menu-items="menuItems"
     @select="onMenuSelect"
   >

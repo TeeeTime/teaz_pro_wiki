@@ -28,7 +28,7 @@ export function createMockAuth(): AuthService {
       const saved = localStorage.getItem(STORAGE_KEY)
       const found = saved === GUEST ? undefined : (USERS.find((u) => u.id === saved) ?? USERS[0])
       id = found?.id ?? null
-      user.value = found ? { name: found.name, username: found.username, roles: [] } : null
+      user.value = found ? { id: found.id, name: found.name, username: found.username, roles: [] } : null
     },
     async login() {
       this.switchUser!(USERS[0].id)
