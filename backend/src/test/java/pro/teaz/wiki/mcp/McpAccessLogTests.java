@@ -109,6 +109,22 @@ class McpAccessLogTests {
 		assertThat(accessLog.forWiki(wiki, 0).entries()).extracting(McpDtos.WikiAccessEntry::query).containsExactly("recent");
 	}
 
+	/** An AI assistant sends whatever it likes; logging it must never break the tool call. */
+	@Test
+	void oversizedInputIsShortenedNotRejected() throws Exception {
+		String wiki = createWiki("Long input");
+		String longQuery = "q".repeat(497) + "😀".repeat(10); // ends in emoji: 2 UTF-16 units each
+
+		accessLog.record(OWNER, wiki, "search_wiki", longQuery);
+		accessLog.record(OWNER, "not-a-wiki-id-at-all", "get_page", "guides/setup");
+
+		String stored = accessLog.forWiki(wiki, 0).entries().getFirst().query();
+		assertThat(stored.codePointCount(0, stored.length())).isLessThanOrEqualTo(500);
+		assertThat(stored).startsWith("q".repeat(497)).endsWith("…");
+		assertThat(Character.isHighSurrogate(stored.charAt(stored.length() - 2))).isFalse();
+		assertThat(accessLog.recent(OWNER)).extracting(McpDtos.AccessLogEntry::query).contains("guides/setup");
+	}
+
 	private static McpAccessLog entryFrom(long daysAgo, String wiki, String query) throws Exception {
 		McpAccessLog entry = new McpAccessLog(OWNER, wiki, "search_wiki", query);
 		Field createdAt = McpAccessLog.class.getDeclaredField("createdAt");
